@@ -1,0 +1,4 @@
+git add DH.py
+git commit -m "Init"
+git remote add origin https://github.com/Satsuta-A/ALGORITHMS.git
+git push -u origin master
