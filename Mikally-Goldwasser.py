@@ -26,7 +26,7 @@ if __name__ == '__main__':
 	p, q = randprime(2**15, 2**16), randprime(2**15, 2**16)
 	n = p * q
 	y = randint(2, n - 1)
-	while jacobi_symbol(y, n) == 0 or legendre_symbol(y, p) == 1 or legendre_symbol(y, q) == 1:
+	while jacobi_symbol(y, n) != 1 or legendre_symbol(y, p) == 1 or legendre_symbol(y, q) == 1:
 		y = randint(2, n - 1)
 	m = 123456789
 	print(list(map(int, list(bin(m)[2:]))))
