@@ -24,7 +24,6 @@ def blume_goldwasser_e(n, m):
 
 	return (xor_lists(m, b), pow(x[-1], 2, n))
 
-
 def blume_goldwasser_d(p, q, c):
 	y = c[1]
 	c = c[0]
@@ -38,7 +37,6 @@ def blume_goldwasser_d(p, q, c):
 
 	return xor_lists(c, b)
 
-
 if __name__ == '__main__':
 	p, q = randprime(2**15, 2**16), randprime(2**15, 2**16)
 	while not (p % 4 == 3 and q % 4 == 3):
@@ -49,7 +47,7 @@ if __name__ == '__main__':
 	#p = 31
 	#q = 23
 	#n = 713
-
+	
 	c = blume_goldwasser_e(n, m)
 	print(m)
 	print(c)

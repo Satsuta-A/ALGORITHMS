@@ -5,11 +5,9 @@ def el_gamal(p, M):
 	g = primitive_root(p)
 	x = randint(2, p - 1)
 	y = pow(g, x, p)
-
 	k = randint(2, p - 1)
 	while gcd(k, p - 1) != 1:
 		k = randint(2, p - 1)
-
 	C = M * pow(y, k, p) % p 
 	a = pow(g, k, p)
 	print(C)
