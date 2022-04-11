@@ -3,6 +3,17 @@ from sympy import mod_inverse
 import sympy as sp
 from sympy.polys.domains import ZZ
 from sympy.polys.galoistools import gf_factor
+from random import randint
+
+def cringe(n: int, t: int, s: int):
+    dct = sp.factorint(n)
+    e, d = 1, 1
+    for item in dct.keys():
+        if s % e * pow(item, dct[item]):
+            e *= pow(item, dct[item])
+        else:
+            d *= pow(item, dct[item])
+    return e, d
 
 class TF:
     def __init__(self, mod: int, nepr: list, polinom: list):
@@ -14,14 +25,12 @@ class TF:
             self.mod = mod
             self.nepr = nepr
             self.repr = list(poly1d(array(-poly1d(self.nepr[1:])) % self.mod))
-            
             if len(self.nepr) == len(polinom):
                 self.polinom = list(poly1d(polinom[1:]) + polinom[0] * poly1d(self.repr))
                 self.polinom = list(poly1d(array(self.polinom) % self.mod))
             elif len(self.nepr) < len(polinom):
                 raise Exception('bullshit item')
             else:
-
                 self.polinom = list(poly1d(array(polinom) % self.mod))
             self.size = pow(self.mod, len(self.nepr) - 1) - 1
 
@@ -124,8 +133,6 @@ class TF:
 
     def inverse(self):
         try:
-            print(self.size)
-            print(abs(self.degree() - self.size))
             return self.all_items[(abs(self.degree() - self.size) ) % self.size]
         except:
             self.all()
@@ -136,7 +143,21 @@ class TF:
         except:
             self.all()
             return self.all_items[self.degree() * power % self.size]
-
+    def order_a(self, check=False):
+        if self.polinom == [1]:
+            return self.size
+        deg = self.degree()
+        orde = 1
+        if not check:
+            while deg * orde % self.size != 0:
+                orde += 1
+            return orde
+        else:
+            degs = [deg * orde]
+            while deg * orde % self.size != 0:
+                orde += 1
+                degs.append(deg * orde)
+            return orde, degs
     def trace(self):
         tr = TF(self.mod, self.nepr, [0])
         if self.polinom == [0]:
@@ -147,13 +168,32 @@ class TF:
         return tr[0]
     def minpol(self):
         if self.polinom == [1, 0]:
-            n = self.size - 1
+            n = self.size
         else:
-            n = (self.size - 1) // gcd(self.size - 1, self.degree())
-        d = n_order(self.mod, n)
-        from sympy.abc import y
+            n = (self.size) // sp.gcd(self.size, self.degree())
+        d = sp.n_order(self.mod, n)
+        res = pol_for_min([1])
         for i in range(d):
-            break
+            res = res * pol_for_min([1, -pow(self, pow(self.mod, i, self.size - 1))])
+        return res
+
+    def Gauss(self):
+        al = self.all()
+        alpha = randint(1, len(al) - 1)
+        while True:
+            t, degrees = al[alpha].order_a(True)
+            if t == self.size:
+                return al[alpha]
+            else:
+                betta = randint(1, len(al) - 1)
+                while betta in degrees:
+                    betta = randint(1, len(al) - 1)
+                s = al[betta].order_a()
+                if s == self.size:
+                    alpha = betta
+                else:
+                    e, d = cringe(sp.lcm(t, s), t, s)
+                    alpha = (alpha * t // d + betta * s // e) % self.size
 
 class pol_for_min():
     def __init__(self, args: list):
@@ -258,19 +298,48 @@ if __name__ == "__main__":
                         h2 += 1
                 print(h0, h1, h2)"""
 
-    a = pol_for_min([1, 0, 1, 1, 1])
-    b = pol_for_min([1, 1, 1])
-    print(a + b)
-    x = TF(2, [1, 0, 1, 1], [1, 1])
-    y = TF(2, [1, 0, 1, 1], [1, 0, 1])
-    z = TF(2, [1, 0, 1, 1], [1, 1, 1])
-    a = pol_for_min([1, -x])
-    b = pol_for_min([1, -y])
-    c = pol_for_min([1, -z])
-    print((-x)*(-y))
-    print((-x)*(-y)*(-z))
-    x.all(True)
-    print(x*y)
-    print(x*y*z)
-    print(a * b)
-    print(a * b * c)
+    """a = pol_for_min([1, 0, 1, 1, 1])
+                b = pol_for_min([1, 1, 1])
+                print(a + b)
+                x = TF(2, [1, 0, 1, 1], [1, 1])
+                y = TF(2, [1, 0, 1, 1], [1, 0, 1])
+                z = TF(2, [1, 0, 1, 1], [1, 1, 1])
+                a = pol_for_min([1, -x])
+                b = pol_for_min([1, -y])
+                c = pol_for_min([1, -z])
+                print((-x)*(-y))
+                print((-x)*(-y)*(-z))
+                x.all(True)
+                print(x*y)
+                print(x*y*z)
+                print(a * b)
+                print(a * b * c)"""
+    """print('---------')
+                x1 = TF(3, [1, -1, -1], [1, 1])
+                print(x1.minpol())
+                x2 = TF(2, [1, 0, 1, 1], [1, 1])
+                print(x2.minpol())
+                print('---------')
+                a1 = x1.all()
+                a2 = x2.all()
+                for x in a1:
+                    print(x, '- minimal poly -', x.minpol())
+                print('---------')
+                for x in a2:
+                    print(x, '- minimal poly -', x.minpol())"""
+    x = TF(3, [1, -1, -1], [1, 0])
+    print('ph', sp.totient(3 ** 2 - 1))
+    l = []
+    for i in range(100):
+        if not x.Gauss().polinom in l:
+            l.append(x.Gauss().polinom)
+    print(l)
+    print(x.order_a())
+    """for i in range(1, x.size + 1):
+                    print(pow(x, i))"""
+    """print(x.order_a())
+                x = TF(3, [1, -1, -1], [2])
+                print(x.order_a())
+                x = TF(3, [1, -1, -1], [1, 1])
+                print(x.order_a())
+                print(list(sp.factorint(9)))"""
