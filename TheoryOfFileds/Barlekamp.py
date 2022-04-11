@@ -4,37 +4,35 @@ from sympy import mod_inverse
 from sympy.polys.domains import ZZ
 from sympy.polys.galoistools import gf_gcdex, gf_div, gf_pow, gf_factor
 
-def solving(Q: list, p : int, k: int):
-	Q.pop(0)
-	for x in Q:
-		x.pop(0)
-	n = len(Q)
-	m = len(Q)
-	for i in range(n - 1):
-		try:
-			for j in range(m):
-					Q[i][j] = (Q[i][j] * mod_inverse(Q[i][i], p)) % p
-			for j in range(i + 1, n):
-				if Q[j][i] == 0: 
-					continue
-				for t in range(m):
-					Q[j][t] = (Q[j][t] - Q[i][t]) % p
-		except:
-			continue
-
-	for x in Q:
-		if x == [0]*m:
-			Q.pop(Q.index(x))
-	"""print('------')
-				for x in Q:
-					print(x)
-				print('------')"""
-
-	h = []
-	for i in range(1, k):
-		h.append([0] + Q[-k])
-		h[i - 1].reverse()
-	return h
+def Gauss(A, p):
+    Q1 = array(A)
+    r = linalg.matrix_rank(Q1)
+    k = len(A) - r - 1
+    for i in range(len(A)):
+        if A[i][i] == 0:
+            continue
+        A[i] = list(array(A[i]) * mod_inverse(A[i][i], p) % p)
+    for x in A:
+        print(x)
+    for i in range(len(A) - 1):
+        for j in range(i+1, len(A)):
+            if A[i][i] == 0:
+                continue
+            A[j] = list((array(A[j]) - array(A[i]) * A[j][i]) % p)
+    print('---------')
+    for x in A:
+        print(x)
+    h = [[1]]
+    print(k)
+    c = 1
+    for i in range(len(A)):
+        hp = A[len(A) - i - 1]
+        if hp != [0] * len(A):
+            h.append(hp)
+            c += 1
+        if c == k:
+            break
+    return h, k
 
 def conv(lst: list):
 	dct = {}
@@ -70,10 +68,7 @@ def barl(f: list, p: int):
 		Q.append(x + [0] * (len(f) - len(x) - 1))
 	for i in range(len(f) - 1):
 		Q[i][i] = (Q[i][i] - 1) % p
-	Q1 = array(Q)
-	r = linalg.matrix_rank(Q1)
-	k = len(f) - r - 1
-	h = [1] + solving(Q, p, k)
+	h, k = Gauss(Q, p)
 	print(h)
 	for i in range(1, k):
 		for x in F:
@@ -88,10 +83,10 @@ def barl(f: list, p: int):
 	return F
 
 if __name__ == "__main__":
-	print(conv(SF([1, 1, 1, 1, 0, 1, 0, 1], 2)))
-	print(conv(SF([1, 0, 5, 4, 2, 4], 7)))
+	#print(conv(SF([1, 1, 1, 1, 0, 1, 0, 1], 2)))
+	#print(conv(SF([1, 0, 5, 4, 2, 4], 7)))
 	
-	print(gf_factor([1, 1, 1, 1, 0, 1, 0, 1], 2, ZZ))
-	print(gf_factor([1, 0, 5, 4, 2, 4], 7, ZZ))
+	#print(gf_factor([1, 1, 1, 1, 0, 1, 0, 1], 2, ZZ))
+	#print(gf_factor([1, 0, 5, 4, 2, 4], 7, ZZ))
 
 	print(barl([1, 0, 1, 0, 1, 1], 2))
